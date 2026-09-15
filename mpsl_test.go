@@ -5,32 +5,20 @@ import (
 	"time"
 
 	"github.com/koykov/hash/fnv"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIO(t *testing.T) {
 	loadFn := func(tb testing.TB, dbFile string) {
-		var (
-			psdb *DB
-			err  error
-		)
-		if psdb, err = New(fnv.BHasher{}); err != nil {
-			t.Error(err)
-		}
-		if err = psdb.Load(dbFile); err != nil {
-			t.Error(err)
-		}
+		psdb, err := New(fnv.BHasher{})
+		require.NoError(t, err)
+		assert.NoError(t, psdb.Load(dbFile))
 	}
 	fetchFn := func(tb testing.TB, dbURL string) {
-		var (
-			psdb *DB
-			err  error
-		)
-		if psdb, err = New(fnv.BHasher{}); err != nil {
-			t.Error(err)
-		}
-		if err = psdb.Fetch(dbURL); err != nil {
-			t.Error(err)
-		}
+		psdb, err := New(fnv.BHasher{})
+		require.NoError(t, err)
+		assert.NoError(t, psdb.Fetch(dbURL))
 	}
 	t.Run("load small", func(t *testing.T) { loadFn(t, "testdata/small.psdb") })
 	t.Run("load full", func(t *testing.T) { loadFn(t, "testdata/full.psdb") })
@@ -41,16 +29,9 @@ func TestIO(t *testing.T) {
 		fetchFn(t, "https://raw.githubusercontent.com/koykov/publicsuffix/master/testdata/full.psdb")
 	})
 	t.Run("load or fetch", func(t *testing.T) {
-		var (
-			psdb *DB
-			err  error
-		)
-		if psdb, err = New(fnv.BHasher{}); err != nil {
-			t.Error(err)
-		}
-		if err = psdb.LoadOrFetchFullIf("testdata/lof.tmp", time.Second); err != nil {
-			t.Error(err)
-		}
+		psdb, err := New(fnv.BHasher{})
+		require.NoError(t, err)
+		assert.NoError(t, psdb.LoadOrFetchFullIf("testdata/lof.tmp", time.Second))
 	})
 }
 
@@ -87,32 +68,17 @@ func TestGet(t *testing.T) {
 		{hostname: "nosuchtld", tld: "", etld: "", etld1: ""},
 	}
 
-	var (
-		psdb *DB
-		err  error
-	)
-	if psdb, err = New(fnv.BHasher{}); err != nil {
-		t.Error(err)
-	}
-	if err = psdb.Load("testdata/full.psdb"); err != nil {
-		t.Error(err)
-	}
+	psdb, err := New(fnv.BHasher{})
+	require.NoError(t, err)
+	assert.NoError(t, psdb.Load("testdata/full.psdb"))
 
 	for _, s := range stages {
 		t.Run(s.hostname, func(t *testing.T) {
 			tld, etld, etld1, icann := psdb.ParseString(s.hostname)
-			if tld != s.tld {
-				t.Errorf("tld mismatch: need '%s', got '%s'", s.tld, tld)
-			}
-			if etld != s.etld {
-				t.Errorf("etld mismatch: need '%s', got '%s'", s.etld, etld)
-			}
-			if etld1 != s.etld1 {
-				t.Errorf("etld+1 mismatch: need '%s', got '%s'", s.etld1, etld1)
-			}
-			if icann != s.icann {
-				t.Errorf("icann mismatch: need '%t', got '%t'", s.icann, icann)
-			}
+			assert.Equal(t, s.tld, tld)
+			assert.Equal(t, s.etld, etld)
+			assert.Equal(t, s.etld1, etld1)
+			assert.Equal(t, s.icann, icann)
 		})
 	}
 }
