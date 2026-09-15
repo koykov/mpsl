@@ -33,9 +33,9 @@ All PSL data will be stored in special storage optimized for fast access and min
 After initialization database will ready to parse the domains:
 ```go
 domain := "a.b.c.amazon.co.uk"
-tld, icann := db.GetTLDStr(domain) // "uk", true
-etld := db.GetEffectiveTLDStr(domain) // "co.uk"
-etld1 := db.GetEffectiveTLDPlusOneStr(domain) // "amazon.co.uk"
+tld, icann := db.GetTLDString(domain) // "uk", true
+etld := db.GetEffectiveTLDString(domain) // "co.uk"
+etld1 := db.GetEffectiveTLDPlusOneString(domain) // "amazon.co.uk"
 // or get all parts at once
-tld, etld, etld1, icann := db.ParseStr(domain) // the same data ...
+tld, etld, etld1, icann := db.ParseString(domain) // the same data ...
 ```
